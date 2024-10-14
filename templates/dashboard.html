@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Submissions</title>
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
+    <style>
+        /* Initially hide the content */
+        #main-content {
+            display: none;
+        }
+    </style>
+    <script>
+        // Function to prompt for the password on page load
+        function askPassword() {
+            // The password sent from the backend (Django template variable)
+            const backendPassword = '{{ password }}'; 
+            
+            // Ask user for the password
+            let userPassword = prompt("Please enter the password to access this page:");
+            
+            // If the entered password matches the backend password, show the content
+            if (userPassword === backendPassword) {
+                document.getElementById('main-content').style.display = 'block'; // Show main content
+            } else {
+                alert("Incorrect password! You cannot access this page.");
+                window.location.href = "/";  // Redirect to another page or reload
+            }
+        }
+        
+        // Run the password check when the page loads
+        window.onload = function() {
+            askPassword();
+        };
+    </script>
+</head>
+<body>
+    <div id="main-content">
+<div>
+        <label class="switch">
+            <input type="checkbox" id="registrationSwitch" {% if Registrations %}checked{% endif %} onclick="toggleRegistration()">
+            <span class="slider"></span>
+        </label>
+        <span class="status">Registrations: {% if Registrations %}Open{% else %}Closed{% endif %}</span>
+    </div>
+
+    <div>
+        <label class="switch">
+            <input type="checkbox" id="submissionSwitch" {% if Submissions %}checked{% endif %} onclick="toggleSubmissions()">
+            <span class="slider"></span>
+        </label>
+        <span class="status">Submissions: {% if Submissions %}Open{% else %}Closed{% endif %}</span>
+    </div>
+
+    <script>
+        function toggleRegistration() {
+            const isChecked = document.getElementById('registrationSwitch').checked;
+            // AJAX call to update registration status in the backend
+            Example:
+            fetch('toggle-registration', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}', // Ensure to include CSRF token
+                },
+                body: JSON.stringify({ open: isChecked })
+            }).then(response => {
+                // Handle response if needed
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function toggleSubmissions() {
+            const isChecked = document.getElementById('submissionSwitch').checked;
+            // AJAX call to update submission status in the backend
+            // Example:
+            fetch('toggle-submissions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}', // Ensure to include CSRF token
+                },
+                body: JSON.stringify({ open: isChecked })
+            }).then(response => {
+                // Handle response if needed
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+    <div class="container">
+        <h1>Project Submissions</h1>
+        
+<!-- Form with dropdown for selecting dates -->
+<form action="" method="POST">{% csrf_token %}
+    <div class="dropdown-container">
+        <label for="date">Select Submission Date:</label>
+        <select id="date" name="date">
+            {% for date in Dates %}
+            <option value="{{date}}">{{date}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <!-- CSRF token (if using Django or another framework requiring CSRF protection) -->
+    
+    <button type="submit">Submit</button>
+</form>
+
+
+        <!-- List of Project Submission Tiles -->
+        <div class="tiles">
+            {% for project in submissions %}
+            <div class="tile">
+                <h2>Participant Name: {{project.participant.name}}</h2>
+                <p><strong>Form Number:</strong> {{project.participant.form_number}}</p>
+                <p><strong>Email Address:</strong> {{project.participant.email}}</p>
+                <p><strong>Problem Statement:</strong>{{project.problemStatement}}</p>
+                <p><strong>Submission date:</strong>{{project.date|date:"d/m/Y"}}</p>
+                <p><strong>Project Repository:</strong> <a href="{{project.githuburl}}">{{project.githuburl}}</a></p>
+
+                <!-- Score Input and Save Button -->
+                <div class="score-section">
+                    <label for="score">Score:</label>
+                    <input type="number" value="{{project.score}}" id="score-{{project.participant.form_number}}-{{project.date|date:"d/m/Y"}}" name="score-{{project.participant.form_number}}" min="0" max="100" placeholder="Enter score">
+                    <button type="button" onclick="saveScore({{project.participant.form_number}},'{{project.date|date:"d/m/Y"}}')">Save</button>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Add more tiles as needed -->
+        </div>
+    </div>
+
+
+    <script>
+        function saveScore(formNumber, date) {
+            // Get the specific tile using formNumber
+            var scoreInput = document.getElementById('score-' + formNumber+"-"+date);
+            console.log('score-' + formNumber+"-"+date);
+            var score = scoreInput.value;
+            console.log(score);
+    
+            if (score === "") {
+                alert("Please enter a score before saving.");
+                return;
+            }
+    
+            // Create a data object to send to the backend
+            var data = {
+                formNumber: formNumber,
+                date: date,
+                score: score
+            };
+    
+            // Send data to the backend using fetch
+            fetch('submit-score', {  // Replace with your actual backend endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()  // Include CSRF token for security
+                },
+                body: JSON.stringify(data)  // Send the form number, date, and score as JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Score for Form " + formNumber + " on " + date + " saved successfully.");
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred. Please try again.");
+            });
+        }
+    
+        // CSRF token function (for Django or any CSRF-protected framework)
+        function getCSRFToken() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+            return cookieValue || '';
+        }
+    </script>
+  </div>
+    
+</body>
+</html>

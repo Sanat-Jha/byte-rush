@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Styles for submission closed dialog box */
+        .closed-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .closed-dialog-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .closed-dialog-content h1 {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+{% if show %}
+    <div class="container">
+        <h2>Submit Project</h2>
+        <form action="" method="post">
+            {% csrf_token %}
+    
+            <label for="formNumber">Form Number:</label>
+            <input type="text" id="formNumber" name="formNumber" pattern="\d{8}" title="Please enter an 8-digit number" required>
+    
+            <label for="githubRepo">GitHub Repository Link:</label>
+            <input type="url" id="githubRepo" name="githubRepo" pattern="https?://.+" title="Please enter a valid URL starting with http:// or https://" required>
+    
+            <label for="problemStatement">Problem Statement:</label>
+            <select id="problemStatement" name="problemStatement" required>
+                <option value="" disabled selected>Select a problem statement</option>
+                <option value="problem1">Problem Statement 1</option>
+                <option value="problem2">Problem Statement 2</option>
+                <option value="problem3">Problem Statement 3</option>
+                <!-- Add more options as needed -->
+            </select>
+    
+            <input type="submit" value="Register">
+        </form>
+    </div>
+{% else %}
+    <div class="closed-dialog">
+        <div class="closed-dialog-content">
+            <h1>Submissions Closed</h1>
+            <p>The submission period has ended. Please check back later.</p>
+        </div>
+    </div>
+    <script>
+        // Disable scrolling when the submission is closed
+        document.body.style.overflow = 'hidden';
+    </script>
+{% endif %}
+
+<script>
+    // If there's a message to be shown
+    var mssg = "{{ mssg }}"; 
+    var text = "{{ text }}"; 
+
+    if (mssg == "True") {
+        alert(text);
+    }
+</script>
+
+</body>
+</html>

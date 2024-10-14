@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="{% static 'leaderboard.css' %}">
+</head>
+<body>
+
+    <div class="leaderboard-container">
+        <h1>Leaderboard</h1>
+        
+        {% for participant in participants %}
+        <div class="participant-tile">
+            <h2>{{ participant.name }}</h2>
+            <p>Score: {{ participant.score }}</p>
+            <p>Email: {{ participant.email }}</p>
+            <p>Form Number: {{ participant.form_number }}</p>
+        </div>
+        {% empty %}
+        <p>No participants found.</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
