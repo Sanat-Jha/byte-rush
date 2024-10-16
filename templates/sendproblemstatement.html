@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Preview</title>
+    <link rel="stylesheet" href="{% static 'sendproblemstatement.css' %}">
+    <style>
+       
+        #main-content {
+            display: none;
+        }
+    </style>
+    <script>
+        // Function to prompt for the password on page load
+        function askPassword() {
+            // The password sent from the backend (Django template variable)
+            const backendPassword = '{{ password }}'; 
+            
+            // Ask user for the password
+            let userPassword = prompt("Please enter the password to access this page:");
+            
+            // If the entered password matches the backend password, show the content
+            if (userPassword === backendPassword) {
+                document.getElementById('main-content').style.display = 'block'; // Show main content
+            } else {
+                alert("Incorrect password! You cannot access this page.");
+                window.location.href = "https://example.com";  // Redirect to another page or reload
+            }
+        }
+        
+        // Run the password check when the page loads
+        window.onload = function() {
+            askPassword();
+        };
+    </script>
+</head>
+<body>
+    <!-- Page content hidden by default -->
+    <div id="main-content">
+        <div class="container">
+            <h1>Image Upload and Preview</h1>
+            <div class="upload-section">
+                <label for="imageUpload" class="upload-button">Upload Image</label>
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            </div>
+
+            <div class="image-preview">
+                <img id="previewImage" src="" alt="Image Preview" style="display: none;">
+            </div>
+
+            <button id="sendButton" class="send-button" disabled>Send</button>
+        </div>
+    </div>
+
+    <script src="{% static 'sendproblemstatement.js' %}"></script>
+</body>
+</html>

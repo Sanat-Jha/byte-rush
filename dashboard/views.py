@@ -5,6 +5,8 @@ from datetime import datetime
 from submissions.models import Submission,SiteSetting
 from register.models import Participants
 # Create your views here.
+
+
 def dashboard(request):
     unique_dates = list(Submission.objects.dates('date',"day", order='ASC'))
     context = {

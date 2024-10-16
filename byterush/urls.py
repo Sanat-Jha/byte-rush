@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 from register.views import newregister
 from submissions.views import submission
 from leaderboard.views import leaderboard
+from emailproblemstatement.views import sendproblemstatement
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("",home,name="Home"),
@@ -34,4 +35,5 @@ urlpatterns = [
     path("toggle-registration",toggle_registration,name="toggle-registration"),
     path("toggle-submissions",toggle_submission,name="toggle-submission"),
     path('leaderboard/', leaderboard, name='leaderboard'),
+    path('sendproblemstatement/', sendproblemstatement, name='sendproblemstatement'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
